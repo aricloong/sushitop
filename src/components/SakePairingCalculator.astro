@@ -1,0 +1,196 @@
+---
+// src/components/SakePairingCalculator.astro
+import pairingData from '../data/sake-pairing.json';
+---
+
+<div class="sake-calculator" id="sakeCalculator">
+  <div class="calculator-header">
+    <span class="calc-icon">🍶</span>
+    <h3>清酒配对计算器</h3>
+    <p>选择鱼种，获取专业清酒推荐</p>
+  </div>
+  
+  <div class="calc-form">
+    <label for="fishSelect" class="sr-only">选择鱼种</label>
+    <select id="fishSelect" class="calc-select">
+      <option value="">🐟 请选择一种鱼...</option>
+      {pairingData.fishTypes.map(fish => (
+        <option value={fish.id}>{fish.name}</option>
+      ))}
+    </select>
+  </div>
+  
+  <div id="pairingResult" class="calc-result" style="display: none;">
+    <div class="result-content">
+      <div class="sake-badge">
+        <span id="sakeName"></span>
+      </div>
+      <div class="sake-profile" id="sakeProfile"></div>
+      <p class="pairing-reason" id="pairingReason"></p>
+      <div class="pairing-tip">
+        <span>💡 品鉴建议</span>
+        <span id="pairingTip"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .sake-calculator {
+    background: var(--rice-white);
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    padding: 1.5rem;
+    max-width: 500px;
+    margin: 0 auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  
+  .calculator-header {
+    text-align: center;
+    margin-bottom: 1.25rem;
+  }
+  
+  .calc-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .calculator-header h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+    color: var(--indigo);
+  }
+  
+  .calculator-header p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+  
+  .calc-select {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    font-size: 1rem;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .calc-select:focus {
+    outline: none;
+    border-color: var(--indigo);
+  }
+  
+  .calc-result {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 2px dashed var(--border-light);
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .sake-badge {
+    text-align: center;
+    margin-bottom: 0.75rem;
+  }
+  
+  .sake-badge span {
+    display: inline-block;
+    background: var(--indigo);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 40px;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+  
+  .sake-profile {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--salmon);
+    margin-bottom: 1rem;
+  }
+  
+  .pairing-reason {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    padding: 0.75rem;
+    background: var(--rice-white-dark);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+  }
+  
+  .pairing-tip {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--indigo-pale);
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-light);
+  }
+  
+  .pairing-tip span:first-child {
+    font-weight: 500;
+    color: var(--indigo);
+  }
+</style>
+
+<script>
+  const pairingData = {
+    fishTypes: {
+      'tuna-otoro': { name: '金枪鱼大腹', fat: 5 },
+      'buri': { name: '鰤鱼', fat: 4 },
+      'sakura-dai': { name: '樱鲷', fat: 2 }
+    },
+    sakeTypes: {
+      'junmai': { name: '纯米酒', profile: '醇厚米香，旨味丰富', tip: '建议冰镇至10-15°C饮用，室温亦可' },
+      'ginjo': { name: '吟酿', profile: '果香清爽，轻盈顺滑', tip: '冰镇后饮用，果香更突出' },
+      'daiginjo': { name: '大吟酿', profile: '精致花果香，优雅细腻', tip: '低温慢饮，感受花果香气' },
+      'sparkling': { name: '起泡清酒', profile: '气泡酸爽，清新解腻', tip: '充分冰镇，搭配前菜最佳' },
+      'nigori': { name: '浊酒', profile: '甘甜顺滑，米粒口感', tip: '摇匀后饮用，可搭配甜味料理' }
+    },
+    pairingRules: {
+      'tuna-otoro': { sakeId: 'junmai', reason: '高脂肪大腹需醇厚米香平衡油腻感' },
+      'buri': { sakeId: 'ginjo', reason: '中等脂肪适配果香清爽型' },
+      'sakura-dai': { sakeId: 'daiginjo', reason: '细腻优雅，大吟酿的花果香最能衬托' },
+      'salmon': { sakeId: 'daiginjo', reason: '丰腴口感与精致花果香相得益彰' },
+      'unagi': { sakeId: 'nigori', reason: '甜咸风味与浊酒甘甜完美融合' }
+    }
+  };
+  
+  const fishSelect = document.getElementById('fishSelect');
+  const resultDiv = document.getElementById('pairingResult');
+  const sakeNameSpan = document.getElementById('sakeName');
+  const sakeProfileSpan = document.getElementById('sakeProfile');
+  const reasonSpan = document.getElementById('pairingReason');
+  const tipSpan = document.getElementById('pairingTip');
+  
+  fishSelect.addEventListener('change', (e) => {
+    const fishId = e.target.value;
+    
+    if (!fishId) {
+      resultDiv.style.display = 'none';
+      return;
+    }
+    
+    const rule = pairingData.pairingRules[fishId];
+    if (rule) {
+      const sake = pairingData.sakeTypes[rule.sakeId];
+      if (sake) {
+        sakeNameSpan.textContent = sake.name;
+        sakeProfileSpan.textContent = sake.profile;
+        reasonSpan.textContent = rule.reason;
+        tipSpan.textContent = sake.tip;
+        resultDiv.style.display = 'block';
+      }
+    }
+  });
+</script>

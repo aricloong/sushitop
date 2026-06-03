@@ -1,0 +1,144 @@
+---
+// src/components/SeasonalCalendar.astro
+import { getSeasonalFish, getFishList } from '../lib/notion';
+
+const currentMonth = new Date().getMonth() + 1;
+const seasonalFish = await getSeasonalFish(currentMonth);
+const allFish = await getFishList();
+---
+
+<div class="calendar-container">
+  <div class="calendar-header">
+    <span class="calendar-icon">📅</span>
+    <h3>{currentMonth}月 旬味日历</h3>
+    <p>本月最佳时令鱼类推荐</p>
+  </div>
+  
+  {seasonalFish.length > 0 ? (
+    <div class="calendar-grid">
+      {seasonalFish.map(fish => (
+        <div class="calendar-item">
+          <div class="fish-avatar">🐟</div>
+          <div class="fish-info">
+            <div class="fish-name">{fish.name}</div>
+            <div class="fish-jp">{fish.japaneseName}</div>
+            <div class="fish-method">🍽️ {fish.eatingMethod}</div>
+          </div>
+          <div class="season-badge">🌿 旬</div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p class="calendar-empty">本月暂无时令鱼类推荐</p>
+  )}
+  
+  <div class="calendar-note">
+    <p>💡 时令鱼类在不同月份口感最佳，遵循自然规律品尝最美味</p>
+  </div>
+</div>
+
+<style>
+  .calendar-container {
+    background: linear-gradient(135deg, var(--rice-white-dark) 0%, var(--rice-white) 100%);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+  }
+  
+  .calendar-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .calendar-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .calendar-header h3 {
+    font-size: 1.25rem;
+    color: var(--indigo);
+    margin-bottom: 0.25rem;
+  }
+  
+  .calendar-header p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+  
+  .calendar-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .calendar-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: white;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+    transition: transform 0.2s;
+  }
+  
+  .calendar-item:hover {
+    transform: translateX(4px);
+    border-color: var(--indigo-pale);
+  }
+  
+  .fish-avatar {
+    font-size: 2rem;
+  }
+  
+  .fish-info {
+    flex: 1;
+  }
+  
+  .fish-name {
+    font-weight: 600;
+    color: var(--indigo);
+  }
+  
+  .fish-jp {
+    font-size: 0.7rem;
+    color: var(--indigo-pale);
+  }
+  
+  .fish-method {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+  
+  .season-badge {
+    background: var(--salmon);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+  }
+  
+  .calendar-empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+  }
+  
+  .calendar-note {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--indigo-pale);
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+  }
+  
+  @media (min-width: 768px) {
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+  }
+</style>

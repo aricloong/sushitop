@@ -1,0 +1,23 @@
+{
+  "fishTypes": [
+    { "id": "tuna-otoro", "name": "金枪鱼大腹", "fat": 5, "acidity": 2 },
+    { "id": "buri", "name": "鰤鱼", "fat": 4, "acidity": 3 },
+    { "id": "sakura-dai", "name": "樱鲷", "fat": 2, "acidity": 4 },
+    { "id": "salmon", "name": "三文鱼", "fat": 4, "acidity": 2 },
+    { "id": "unagi", "name": "鳗鱼", "fat": 5, "acidity": 1 }
+  ],
+  "sakeTypes": [
+    { "id": "junmai", "name": "纯米酒", "profile": "醇厚米香，旨味丰富", "pairing": "高脂肪鱼类的绝配" },
+    { "id": "ginjo", "name": "吟酿", "profile": "果香清爽，轻盈顺滑", "pairing": "适合中等脂肪鱼" },
+    { "id": "daiginjo", "name": "大吟酿", "profile": "精致花果香，优雅细腻", "pairing": "白身鱼、刺身最佳伴侣" },
+    { "id": "sparkling", "name": "起泡清酒", "profile": "气泡酸爽，清新解腻", "pairing": "清爽鱼类、前菜" },
+    { "id": "nigori", "name": "浊酒", "profile": "甘甜顺滑，米粒口感", "pairing": "浓郁酱烧、鳗鱼" }
+  ],
+  "pairingRules": [
+    { "fishId": "tuna-otoro", "recommendedSake": ["junmai"], "reason": "高脂肪大腹需醇厚米香平衡油腻感" },
+    { "fishId": "buri", "recommendedSake": ["ginjo", "junmai"], "reason": "中等脂肪适配果香或醇厚型" },
+    { "fishId": "sakura-dai", "recommendedSake": ["daiginjo", "sparkling"], "reason": "细腻优雅，大吟酿或起泡最能衬托" },
+    { "fishId": "salmon", "recommendedSake": ["daiginjo"], "reason": "丰腴口感与精致花果香相得益彰" },
+    { "fishId": "unagi", "recommendedSake": ["nigori"], "reason": "甜咸风味与浊酒甘甜完美融合" }
+  ]
+}

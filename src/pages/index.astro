@@ -1,0 +1,152 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getFishList, getSeasonalFish } from '../lib/notion';
+import SearchBar from '../components/SearchBar.astro';
+
+const allFish = await getFishList();
+const currentMonth = new Date().getMonth() + 1;
+const seasonalFish = await getSeasonalFish(currentMonth);
+---
+
+<BaseLayout title="首页">
+  <!-- 英雄区域 -->
+  <div style="text-align: center; padding: 3rem 0 2rem;">
+  <!-- 搜索栏 -->
+<SearchBar />
+    <h1 style="font-size: 2.5rem;">🍣 数字寿司辞典</h1>
+    <p style="color: var(--text-secondary); font-size: 1.1rem;">结构化数据驱动的权威参考 · 旬味日历 · 清酒配对</p>
+  </div>
+  
+  <!-- 当月旬味推荐 -->
+  {seasonalFish.length > 0 && (
+    <section style="margin: 2rem 0;">
+      <h2>🌿 本月旬味推荐 <span style="font-size: 0.9rem; background: var(--salmon); color: white; padding: 0.2rem 0.8rem; border-radius: 20px;">{currentMonth}月</span></h2>
+      <div class="grid">
+        {seasonalFish.map(fish => (
+          <div class="fish-card">
+            {fish.imageUrl ? (
+  <img src={fish.imageUrl} alt={fish.name} style="width:100%; aspect-ratio:4/3; object-fit:cover;" />
+) : (
+  <div class="card-image-placeholder">🐟</div>
+)}
+            <div class="card-content">
+              <h3>{fish.name} <small>{fish.japaneseName}</small></h3>
+              <div class="months">
+                {fish.bestMonths.map(m => (
+                  <span class="month-tag" data-active={m === `${currentMonth}月`}>{m}</span>
+                ))}
+              </div>
+              <div class="pairing">
+                <span>🍽️ {fish.eatingMethod}</span>
+                <span>🍶 {fish.sakePairing}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+  
+  <!-- 全部鱼种 -->
+  <section style="margin: 3rem 0;">
+    <h2>📖 全部鱼种图鉴</h2>
+    <div class="grid">
+      {allFish.map(fish => (
+        <div class="fish-card">
+          <div class="card-image-placeholder">🐟</div>
+          <div class="card-content">
+            <h3>{fish.name} <small>{fish.japaneseName}</small></h3>
+            <div class="months">
+              {fish.bestMonths.slice(0, 4).map(m => (
+                <span class="month-tag">{m}</span>
+              ))}
+            </div>
+            <div class="pairing">
+              <span>🍽️ {fish.eatingMethod}</span>
+              <span>🍶 {fish.sakePairing}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+  
+  .fish-card {
+    background: var(--rice-white);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .fish-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
+  
+  .card-image-placeholder {
+    aspect-ratio: 4/3;
+    background: var(--rice-white-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+  }
+  
+  .card-content {
+    padding: 1rem;
+  }
+  
+  .card-content h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .card-content h3 small {
+    font-size: 0.75rem;
+    color: var(--indigo-pale);
+    font-weight: normal;
+  }
+  
+  .months {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .month-tag {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: var(--rice-white-dark);
+    color: var(--text-secondary);
+  }
+  
+  .month-tag[data-active="true"] {
+    background: var(--salmon);
+    color: white;
+  }
+  
+  .pairing {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: var(--indigo-pale);
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--border-light);
+  }
+</style>

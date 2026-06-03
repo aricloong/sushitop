@@ -1,0 +1,180 @@
+---
+// src/components/SearchBar.astro
+---
+
+<div class="search-wrapper">
+  <div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input 
+      type="text" 
+      id="searchInput" 
+      placeholder="搜索鱼种、清酒、知识..." 
+      class="search-input"
+      autocomplete="off"
+    />
+    <button id="clearSearch" class="clear-btn" style="display: none;">✕</button>
+  </div>
+  
+  <div id="searchResults" class="search-results"></div>
+</div>
+
+<style>
+  .search-wrapper {
+    margin: 1rem 0 2rem;
+  }
+  
+  .search-bar {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 2px solid var(--border-light);
+    border-radius: 48px;
+    padding: 0.25rem 0.25rem 0.25rem 1rem;
+    transition: all 0.2s;
+  }
+  
+  .search-bar:focus-within {
+    border-color: var(--indigo);
+    box-shadow: 0 0 0 3px rgba(44, 62, 107, 0.1);
+  }
+  
+  .search-icon {
+    font-size: 1.2rem;
+    color: var(--indigo-pale);
+  }
+  
+  .search-input {
+    flex: 1;
+    border: none;
+    padding: 0.875rem 0.75rem;
+    font-size: 1rem;
+    background: transparent;
+    outline: none;
+  }
+  
+  .clear-btn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    color: var(--text-secondary);
+    border-radius: 40px;
+  }
+  
+  .clear-btn:hover {
+    color: var(--indigo);
+  }
+  
+  .search-results {
+    margin-top: 1rem;
+  }
+  
+  .search-result-item {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: background 0.2s;
+    text-decoration: none;
+    display: block;
+  }
+  
+  .search-result-item:hover {
+    background: var(--rice-white-dark);
+  }
+  
+  .search-result-title {
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    color: var(--indigo);
+    margin-bottom: 0.25rem;
+  }
+  
+  .search-result-excerpt {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+  
+  .search-empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+  }
+</style>
+
+<script>
+  // 客户端搜索数据
+  let searchIndex = null;
+  const searchInput = document.getElementById('searchInput');
+  const resultsContainer = document.getElementById('searchResults');
+  const clearBtn = document.getElementById('clearSearch');
+  
+  // 从页面获取鱼种数据
+  async function buildSearchIndex() {
+    try {
+      const response = await fetch('/api/fish.json');
+      if (response.ok) {
+        searchIndex = await response.json();
+      } else {
+        // 从 DOM 收集数据
+        const cards = document.querySelectorAll('.fish-card');
+        searchIndex = Array.from(cards).map(card => {
+          const title = card.querySelector('h3')?.textContent || '';
+          const japanese = card.querySelector('small')?.textContent || '';
+          const months = card.querySelectorAll('.month-tag');
+          const monthText = Array.from(months).map(m => m.textContent).join(' ');
+          return { title, japanese, monthText, element: card };
+        });
+      }
+    } catch (e) {
+      console.log('搜索索引构建失败');
+    }
+  }
+  
+  function performSearch(query) {
+    if (!query || query.trim().length < 1) {
+      resultsContainer.innerHTML = '';
+      return;
+    }
+    
+    query = query.toLowerCase().trim();
+    
+    if (!searchIndex) {
+      resultsContainer.innerHTML = '<div class="search-empty">🔍 搜索初始化中...</div>';
+      return;
+    }
+    
+    const results = searchIndex.filter(item => {
+      const title = (item.title || '').toLowerCase();
+      const japanese = (item.japanese || '').toLowerCase();
+      const months = (item.monthText || '').toLowerCase();
+      return title.includes(query) || japanese.includes(query) || months.includes(query);
+    });
+    
+    if (results.length === 0) {
+      resultsContainer.innerHTML = '<div class="search-empty">😔 未找到相关内容，试试其他关键词</div>';
+      return;
+    }
+    
+    resultsContainer.innerHTML = results.map(item => `
+      <div class="search-result-item">
+        <div class="search-result-title">${item.title}</div>
+        <div class="search-result-excerpt">${item.japanese || ''} ${item.monthText || ''}</div>
+      </div>
+    `).join('');
+  }
+  
+  searchInput.addEventListener('input', (e) => {
+    const hasValue = e.target.value.trim().length > 0;
+    clearBtn.style.display = hasValue ? 'block' : 'none';
+    performSearch(e.target.value);
+  });
+  
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    resultsContainer.innerHTML = '';
+    clearBtn.style.display = 'none';
+    searchInput.focus();
+  });
+  
+  buildSearchIndex();
+</script>
