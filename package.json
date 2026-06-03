@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "prebuild": "chmod +x node_modules/.bin/astro || true",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview"
@@ -12,7 +13,6 @@
   },
   "devDependencies": {
     "@notionhq/client": "^2.2.15",
-    "@pagefind/default-ui": "^1.5.2",
     "dotenv": "^16.3.1"
   }
 }
